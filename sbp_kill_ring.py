@@ -60,11 +60,13 @@ class SbpKillRing:
         However, we do need some kind of sanitation to make sure
         we don't push too many white spaces."""
 
-        sanitized = string.strip(text)
-        if len(sanitized) == 0:
-            return
+        #sanitized = string.strip(text)
+        #if len(sanitized) == 0:
+        #    return
 
-        self.buffer.insert(0, sanitized)
+        #self.buffer.insert(0, sanitized)
+
+        self.buffer.insert(0, text) # do not sanitize!
         if len(self.buffer) > self.limit:
             self.buffer.pop()
 
@@ -119,6 +121,7 @@ class SbpYankChoiceCommand(sublime_plugin.TextCommand):
         regions.reverse()
 
         text = sbp_kill_ring.get(idx)
+        sbp_kill_ring.seal()
         for s in regions:
             num = self.view.insert(edit, s.begin(), text)
             self.view.erase(edit, sublime.Region(s.begin() + num,
@@ -133,6 +136,7 @@ class SbpYankChoiceCommand(sublime_plugin.TextCommand):
 class SbpYankCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         text = sbp_kill_ring.top()
+        sbp_kill_ring.seal()
         lines = text.splitlines()
 
         regions = [r for r in self.view.sel()]
