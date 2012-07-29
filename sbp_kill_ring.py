@@ -30,13 +30,13 @@ class SbpUtil:
         return ord(nextChar) == 0
 
     @classmethod
-    def add_to_kill_ring(cls, view):
+    def add_to_kill_ring(cls, view, forward = False):
         # kill_with_copy setting enables editor copy when kill (C-w)
         # or Emacs-copy (M-w) is invoked.
         kill_with_copy = view.settings().get("sbp_kill_with_copy", True)
         if kill_with_copy:
             view.run_command("copy")
-        view.run_command("sbp_add_to_kill_ring", {"forward": False})
+        view.run_command("sbp_add_to_kill_ring", {"forward": forward})
 
 
 class SbpKillRing:
@@ -45,6 +45,7 @@ class SbpKillRing:
         self.buffer = []
         self.kill_points = []
         self.kill_id = 0
+        self.head = 0
 
     def top(self):
         return self.buffer[self.head]
@@ -279,5 +280,5 @@ class SbpKillLineCommand(sublime_plugin.TextCommand):
         expanded = self.expandSelectionForKill(self.view, s.begin(), s.end())
         self.view.sel().clear()
         self.view.sel().add(expanded)
-        SbpUtil.add_to_kill_ring(self.view)
+        SbpUtil.add_to_kill_ring(self.view, True)
         self.view.erase(edit, expanded)
